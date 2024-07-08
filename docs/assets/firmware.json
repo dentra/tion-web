@@ -1,0 +1,42 @@
+[
+  {
+    "type": "4s",
+    "code": "02D0",
+    "path": "firmware_4s_02D0.bin",
+    "size": 109712
+  },
+  {
+    "type": "4s",
+    "code": "02E0",
+    "like": true,
+    "path": "firmware_4s_02E0.bin",
+    "size": 109892,
+    "sha1": "5aaff3049bb6a718f3a11d86d85dda35e623fa29"
+  },
+  {
+    "type": "4s",
+    "code": "0356",
+    "path": "firmware_4s_0356.bin",
+    "size": 111460
+  },
+  {
+    "type": "lt",
+    "code": "054B",
+    "like": true,
+    "path": "firmware_lt_054B.bin",
+    "size": 105332
+  },
+  {
+    "type": "lt",
+    "code": "0570",
+    "path": "firmware_lt_02E0.bin",
+    "size": 103108
+  },
+  {
+    "type": "lt",
+    "code": "test",
+    "path": "firmware_lt_test.bin",
+    "test": true,
+    "size": 98638
+  }
+]
