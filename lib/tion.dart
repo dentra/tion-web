@@ -316,6 +316,8 @@ abstract class TionState extends TionCommand {
   late int targetTemperature;
   late int currentTemperature;
   late int outdoorTemperature;
+  late int maxSpeed;
+  late int heaterVar;
   TionState(super._data);
 }
 
@@ -347,6 +349,8 @@ class TionStateRsp4S extends TionState {
     fanSpeed = bd.getUint8(4);
     outdoorTemperature = bd.getInt8(5);
     currentTemperature = bd.getInt8(6);
+    maxSpeed = bd.getUint8(29);
+    heaterVar = bd.getUint8(30);
   }
 }
 
@@ -373,6 +377,8 @@ class TionStateRspLT extends TionState {
     fanSpeed = bd.getUint8(4);
     outdoorTemperature = bd.getInt8(5);
     currentTemperature = bd.getInt8(6);
+    maxSpeed = bd.getUint8(54);
+    heaterVar = bd.getUint8(55);
   }
 }
 

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:convert/convert.dart';
+import 'package:tion_web/speed_widget.dart';
 import 'tion.dart';
 
 class TionStateWidget extends StatefulWidget {
@@ -71,20 +72,13 @@ class _TionStateWidgetState extends State<TionStateWidget> {
                     subtitle: const Text("Состояние"),
                   ),
                   ListTile(
-                    leading: _state!.powerState
-                        ? _state!.fanSpeed == 2
-                            ? const Icon(Icons.looks_two_outlined)
-                            : _state!.fanSpeed == 3
-                                ? const Icon(Icons.looks_3_outlined)
-                                : _state!.fanSpeed == 4
-                                    ? const Icon(Icons.looks_4_outlined)
-                                    : _state!.fanSpeed == 5
-                                        ? const Icon(Icons.looks_5_outlined)
-                                        : _state!.fanSpeed == 6
-                                            ? const Icon(Icons.looks_6_outlined)
-                                            : const Icon(
-                                                Icons.looks_one_outlined)
-                        : const Icon(Icons.mode_fan_off),
+                    leading: _fanSpeedIcon,
+                    title: SpeedWidget(
+                        speed: _state?.fanSpeed ?? 0,
+                        maxSpeed: _state?.maxSpeed ?? 0,
+                        setSpeed: (speed) {
+                          // do change speed here
+                        }),
                     subtitle: const Text("Скорость вентиляции"),
                   ),
                   ListTile(
@@ -92,7 +86,7 @@ class _TionStateWidgetState extends State<TionStateWidget> {
                         ? const Icon(Icons.flash_on_outlined)
                         : const Icon(Icons.flash_off_outlined),
                     title: _state!.heaterState
-                        ? const Text("Включен")
+                        ? Text("Включен: ${_state!.heaterVar.toInt()} %")
                         : const Text("Выключен"),
                     subtitle: const Text("Обогреватель"),
                   ),
@@ -102,16 +96,36 @@ class _TionStateWidgetState extends State<TionStateWidget> {
                     subtitle: const Text("Целевая температура"),
                   ),
                   ListTile(
-                    leading: const Icon(Icons.thermostat_outlined),
+                    leading: const Icon(Icons.home_outlined),
                     title: Text("${_state!.currentTemperature.toInt()} °C"),
                     subtitle: const Text("Температура внутри"),
                   ),
                   ListTile(
-                    leading: const Icon(Icons.thermostat_outlined),
+                    leading: const Icon(Icons.park_outlined),
                     title: Text("${_state!.outdoorTemperature.toInt()} °C"),
                     subtitle: const Text("Температура снаружи"),
                   ),
                 ],
               )));
+  }
+
+  Icon get _fanSpeedIcon {
+    if (!_state!.powerState) {
+      return const Icon(Icons.mode_fan_off);
+    }
+    switch (_state!.fanSpeed) {
+      case 2:
+        return const Icon(Icons.looks_two_outlined);
+      case 3:
+        return const Icon(Icons.looks_3_outlined);
+      case 4:
+        return const Icon(Icons.looks_4_outlined);
+      case 5:
+        return const Icon(Icons.looks_5_outlined);
+      case 6:
+        return const Icon(Icons.looks_6_outlined);
+      default:
+        return const Icon(Icons.looks_one_outlined);
+    }
   }
 }

@@ -172,8 +172,11 @@ class _TionFirmwareWidgetState extends State<TionFirmwareWidget>
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
-                    TextButton(
-                      child: _updateState == UpdateState.stopped
+                    TextButton.icon(
+                      icon: _updateState == UpdateState.stopped
+                          ? const Icon(Icons.system_update_outlined)
+                          : const Icon(Icons.dangerous_outlined),
+                      label: _updateState == UpdateState.stopped
                           ? const Text("ОБНОВИТЬ")
                           : const Text("ПРЕРВАТЬ"),
                       onPressed: () {
@@ -188,41 +191,39 @@ class _TionFirmwareWidgetState extends State<TionFirmwareWidget>
                   ],
                 ),
               if (_selectedFirmware != null)
-                const Center(
-                  child: Column(
-                    children: [
-                      Text(
-                        "ВНИМАНИЕ!",
-                        style: TextStyle(fontSize: 40, color: Colors.red),
-                      ),
-                      Text(
-                        "Нажимая кнопку ОБНОВИТЬ Вы соглашаетесь с тем,",
-                        style: TextStyle(fontSize: 20, color: Colors.red),
-                      ),
-                      Text(
-                        "что осознаете риск и принимаете ответственность за все возможные последствия!",
-                        style: TextStyle(fontSize: 20, color: Colors.red),
-                        //
-                      ),
-                      Divider(
-                        height: 20,
-                        thickness: 5,
-                        indent: 20,
-                        endIndent: 0,
-                      ),
-                      Text(
-                        "Обеспечьте стабильное питание для бризера и ПК во время обновления",
-                        style: TextStyle(fontSize: 20, color: Colors.red),
-                        //
-                      ),
-                      Text(
-                        "Не переключайтесь на другие окна и не давайте ПК заснуть",
-                        style: TextStyle(fontSize: 20, color: Colors.red),
-                        //
-                      ),
-                    ],
-                  ),
-                )
+                const Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.warning_outlined,
+                          size: 40,
+                          color: Colors.red,
+                        ),
+                        Text(
+                          "ВНИМАНИЕ!",
+                          style: TextStyle(fontSize: 40, color: Colors.red),
+                        ),
+                      ],
+                    ),
+                    Text(
+                      "Нажимая кнопку ОБНОВИТЬ Вы соглашаетесь с тем,\nчто осознаете риск и принимаете ответственность за все возможные последствия!",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 24, color: Colors.red),
+                    ),
+                    Padding(padding: EdgeInsets.symmetric(vertical: 16.0)),
+                    Text(
+                      "Обеспечьте стабильное питание для бризера и ПК во время обновления.\n"
+                      "Не переключайтесь на другие окна и не давайте ПК заснуть.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 16, color: Colors.red),
+                      //
+                    ),
+                  ],
+                ),
             ],
           ),
         ));
