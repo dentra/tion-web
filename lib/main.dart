@@ -90,13 +90,14 @@ class _TionFlasherAppState extends State<TionFlasherApp>
             controller: tion.connected ? _tabController : null,
             children: [
               if (!tion.connected)
-                const Column(
-                  children: [
-                    Center(child: Text('Ожидание соединения...')),
-                    Center(
-                        child: Text(
-                            'При первичном подключении Вам необходимо ввести бризер в режим сопряжения.')),
-                  ],
+                const Center(
+                  child: Column(
+                    children: [
+                      Text('Ожидание соединения...'),
+                      Text(
+                          'При первичном подключении Вам необходимо ввести бризер в режим сопряжения.'),
+                    ],
+                  ),
                 ),
               if (tion.connected)
                 TionStateWidget(
