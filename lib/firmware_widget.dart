@@ -192,7 +192,7 @@ class _TionFirmwareWidgetState extends State<TionFirmwareWidget>
                   child: Column(
                     children: [
                       Text(
-                        "ВНМАНИЕ!",
+                        "ВНИМАНИЕ!",
                         style: TextStyle(fontSize: 40, color: Colors.red),
                       ),
                       Text(
@@ -200,7 +200,7 @@ class _TionFirmwareWidgetState extends State<TionFirmwareWidget>
                         style: TextStyle(fontSize: 20, color: Colors.red),
                       ),
                       Text(
-                        "что осознаете риск и принимаете отвественность за все возможные последсвтия!",
+                        "что осознаете риск и принимаете ответственность за все возможные последствия!",
                         style: TextStyle(fontSize: 20, color: Colors.red),
                         //
                       ),
