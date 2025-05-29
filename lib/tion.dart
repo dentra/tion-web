@@ -441,7 +441,7 @@ class TionUpdateStartRsp extends TionCommand {
 }
 
 // Шаг 3. Отправка части прошивки.
-// Содержимое певрго пакета: структура firmware_chunk_t.
+// Содержимое первого пакета: структура firmware_chunk_t.
 // Содержимое последнего пакета: структура firmware_chunk_crc_t.
 class TionUpdateChunkReq extends TionCommand {
   static const int id = 0x4006;
