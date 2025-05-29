@@ -27,6 +27,7 @@ class _TionFlasherAppState extends State<TionFlasherApp>
   late TabController _tabController;
 
   BluetoothDevice? _device;
+  BuildContext? _floatContext;
 
   final tion = TionBLE();
   final updateStateController = UpdateStateController();
@@ -124,20 +125,29 @@ class _TionFlasherAppState extends State<TionFlasherApp>
           floatingActionButton: !FlutterWebBluetooth
                   .instance.isBluetoothApiSupported
               ? null
-              : FloatingActionButton(
-                  onPressed: requestDevice,
-                  tooltip: tion.connected ? 'Переподключиться' : 'Подключиться',
-                  child: Icon(tion.connected
-                      ? Icons.bluetooth_connected_outlined
-                      : Icons.bluetooth_outlined),
-                ),
+              : Builder(builder: (context) {
+                  return FloatingActionButton(
+                    onPressed: _requestDevice(context),
+                    tooltip:
+                        tion.connected ? 'Переподключиться' : 'Подключиться',
+                    child: Icon(tion.connected
+                        ? Icons.bluetooth_connected_outlined
+                        : Icons.bluetooth_outlined),
+                  );
+                }),
         ),
       ),
     );
   }
 
+  VoidCallback _requestDevice(BuildContext context) {
+    _floatContext = context;
+    return requestDevice;
+  }
+
   Future<void> requestDevice() async {
     if (!FlutterWebBluetooth.instance.isBluetoothApiSupported) {
+      _reportError("Отсутствует поддержка Bluetooth в браузере");
       return;
     }
 
@@ -177,14 +187,30 @@ class _TionFlasherAppState extends State<TionFlasherApp>
 
       await _device!.connect();
       log.i("Device ${_device!.name ?? ""} connected");
+      _reportError("Подключено");
     } on BluetoothAdapterNotAvailable {
-      log.e("BluetoothAdapterNotAvailable");
+      _reportError("Отсутствует Bluetooth-адаптер");
     } on UserCancelledDialogError {
-      log.e("UserCancelledDialogError");
+      _reportError("Подключение отменено");
     } on DeviceNotFoundError {
-      log.e("DeviceNotFoundError");
+      _reportError("Не найдено подходящих устройств");
     } catch (e, s) {
+      _reportError(e.toString());
       log.e(e, stackTrace: s);
     }
+  }
+
+  void _reportError(final String message) {
+    if (_floatContext == null) {
+      return;
+    }
+    if (!_floatContext!.mounted) {
+      return;
+    }
+    ScaffoldMessenger.of(_floatContext!).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
   }
 }
