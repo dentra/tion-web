@@ -144,7 +144,7 @@ class _TionFirmwareWidgetState extends State<TionFirmwareWidget>
                       value: fw,
                       label: fw.name,
                       enabled: !fw.test && _firmwareVersion != fw.name,
-                      leadingIcon: fw.fav
+                      leadingIcon: fw.like
                           ? const Icon(Icons.favorite)
                           : const Icon(Icons.bookmark),
                     );
@@ -241,8 +241,8 @@ class _TionFirmwareWidgetState extends State<TionFirmwareWidget>
   }
 
   Future<void> _loadFirmwareVersions() async {
-    final res = await loadFirmwareInfo(
-        FirmwareType.fromDevName(_tion.devName), _reportError);
+    final fwType = FirmwareType.fromDevName(_tion.devName);
+    final res = await fwType.list(_reportError);
     if (res.isNotEmpty) {
       setState(() {
         _versions = res;
@@ -276,7 +276,7 @@ class _TionFirmwareWidgetState extends State<TionFirmwareWidget>
   }
 
   void _reportStop() {
-    _reportError("Отсановлено пользователем");
+    _reportError("Остановлено пользователем");
   }
 
   Future<void> _loadFirmware() async {
@@ -291,7 +291,7 @@ class _TionFirmwareWidgetState extends State<TionFirmwareWidget>
       _updateState = UpdateState.download;
     });
 
-    _firmwareData = await loadFirmware(_selectedFirmware!, _reportError);
+    _firmwareData = await _selectedFirmware!.load(_reportError);
     if (_firmwareData.isEmpty) {
       _updateState = UpdateState.stopped;
       return;
@@ -310,7 +310,7 @@ class _TionFirmwareWidgetState extends State<TionFirmwareWidget>
     });
 
     final valid =
-        await validateFirmware(_selectedFirmware!, _firmwareData, _reportError);
+        await _selectedFirmware!.validate(_firmwareData, _reportError);
 
     if (!valid) {
       return;

@@ -1,14 +1,12 @@
-import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:convert/convert.dart';
-import 'package:http/browser_client.dart';
-import 'package:http/http.dart';
-import 'package:cryptography/cryptography.dart';
+import 'package:http/http.dart' as http;
+import 'package:webcrypto/webcrypto.dart';
 
-import 'tion.dart';
 import 'log.dart';
+import 'tion.dart';
 
 const _fwRepo = "dentra/tion-firmware";
 const _fwBranch = "master";
@@ -42,6 +40,13 @@ enum FirmwareType {
     }
     return FirmwareType.unknown;
   }
+
+  Future<List<FirmwareInfo>> list(void Function(String) reportError) async {
+    return _loadFirmwareInfo(this, reportError);
+  }
+
+  bool get isEmpty => type.isEmpty;
+  bool get isNotEmpty => type.isNotEmpty;
 }
 
 class FirmwareInfo {
@@ -50,18 +55,20 @@ class FirmwareInfo {
   final String path;
   final int size;
   final String hash;
-  final bool fav;
+  final bool like;
   final bool test;
   int get version => int.parse(name, radix: 16);
+
   const FirmwareInfo({
-    required this.type,
-    required this.name,
-    required this.path,
-    required this.size,
-    required this.hash,
-    required this.fav,
-    required this.test,
+    this.type = FirmwareType.unknown,
+    this.name = "",
+    this.path = "",
+    this.size = 0,
+    this.hash = "",
+    this.like = false,
+    this.test = false,
   });
+
   factory FirmwareInfo.fromJson(final Map<String, dynamic> meta) {
     return FirmwareInfo(
       type: FirmwareType.fromBrType(meta["type"] ?? ""),
@@ -69,17 +76,25 @@ class FirmwareInfo {
       path: meta["path"] ?? "",
       size: meta["size"] ?? 0,
       hash: meta["sha1"] ?? "",
-      fav: meta["fav"] ?? false,
+      like: meta["like"] ?? false,
       test: meta["test"] ?? false,
     );
   }
+
+  Future<bool> validate(
+      final Uint8List data, void Function(String) reportError) async {
+    return _validateFirmware(this, data, reportError);
+  }
+
+  Future<Uint8List> load(void Function(String) reportError) async {
+    return _loadFirmware(this, reportError);
+  }
 }
 
-Future<Response?> _load(
+Future<http.Response?> _load(
     final String url, void Function(String) reportError) async {
   log.t("Loading $url");
-  final client = BrowserClient();
-  final response = await client.get(Uri.parse(url));
+  final response = await http.get(Uri.parse(url));
   if (response.statusCode != 200) {
     reportError("statusCode ${response.statusCode}, $url");
     return null;
@@ -93,7 +108,7 @@ Future<T> _loadJson<T>(final String url, T Function(dynamic) transform,
   return transform(response == null ? null : jsonDecode(response.body));
 }
 
-Future<List<FirmwareInfo>> loadFirmwareInfo(
+Future<List<FirmwareInfo>> _loadFirmwareInfo(
     final FirmwareType type, void Function(String) reportError) async {
   log.d("Loading firmware metadata for $type");
 
@@ -105,11 +120,11 @@ Future<List<FirmwareInfo>> loadFirmwareInfo(
 
   return meta
       .map((json) => FirmwareInfo.fromJson(json))
-      .where((info) => info.type == type)
+      .where((info) => type.isEmpty ? true : info.type == type)
       .toList();
 }
 
-Future<Uint8List> loadFirmware(
+Future<Uint8List> _loadFirmware(
     final FirmwareInfo info, void Function(String) reportError) async {
   log.d("Loading firmware: ${info.path}");
   Uint8List? data = (await _load("$_fwPathPrefix/${info.path}",
@@ -123,22 +138,21 @@ Future<Uint8List> loadFirmware(
   return data;
 }
 
-Future<bool> validateFirmware(final FirmwareInfo info, final Uint8List data,
+Future<bool> _validateFirmware(final FirmwareInfo info, final Uint8List data,
     void Function(String) reportError) async {
   log.d("Validating firmware ${info.name} metadata for ${info.type}");
 
   if (data.length != info.size) {
     reportError(
-        "Не соответсвующая длинна загруженного файла ${data.length}, ожидаемо ${info.size}");
+        "Ошибка длинны загруженного файла ${data.length}, ожидаемо ${info.size}");
     return false;
   }
 
   if (info.hash.isNotEmpty) {
-    final algorithm = Sha1();
-    final hash = hex.encode((await algorithm.hash(data)).bytes);
+    final digest = await Hash.sha1.digestBytes(data);
+    final hash = hex.encode(digest);
     if (hash != info.hash) {
-      reportError(
-          "Не соответсвующая контрольная сумма загруженного файла: $hash");
+      reportError("Ошибка контрольной суммы загруженного файла: $hash");
       return false;
     }
   }
