@@ -1,5 +1,7 @@
 бризер
 бризера
+бризеров
+даунгрейд
 breezer
 crclib
 cupertino

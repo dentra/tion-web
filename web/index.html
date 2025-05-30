@@ -19,14 +19,8 @@
 
   <title>Tion breezer control and firmware flasher</title>
   <link rel="manifest" href="manifest.json">
-  <style>
-    @media (prefers-color-scheme: dark) {
-      body {
-          background-color: black;
-          color: white;
-      }
-  }
-  </style>
+  <link rel="stylesheet" href="style.css" />
+
   <script>
     if(!(window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNotTrack === "yes" || navigator.msDoNotTrack === "1")) {
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -40,6 +34,10 @@
     </script>
 </head>
 <body>
-  <script>{{flutter_bootstrap_js}}</script>
+  <div class="progress-container" id="progress">
+    <div class="progress-bar" id="progressbar"></div>
+  </div>
+  <!-- https://github.com/monster555/flutter_web_loading_tips -->
+  <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
