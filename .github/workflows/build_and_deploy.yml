@@ -51,7 +51,9 @@ jobs:
         run: flutter pub get
 
       - name: ✅ Run tests
-        run: flutter test --coverage
+        run: |
+          flutter pub run webcrypto:setup
+          flutter test --coverage
 
       - name: 🏗️ Build project
         run: flutter build web --release --base-href=${{env.BUILD_BASE_HREF}} -o ${{env.BUILD_OUTPUT}}
