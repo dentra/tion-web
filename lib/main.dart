@@ -32,6 +32,9 @@ class _TionFlasherAppState extends State<TionFlasherApp>
   final tion = TionBLE();
   final updateStateController = UpdateStateController();
 
+  bool get isBluetoothApiSupported =>
+      FlutterWebBluetooth.instance.isBluetoothApiSupported;
+
   @override
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
@@ -90,12 +93,33 @@ class _TionFlasherAppState extends State<TionFlasherApp>
           body: TabBarView(
             controller: tion.connected ? _tabController : null,
             children: [
-              if (!tion.connected)
+              if (!tion.connected && !isBluetoothApiSupported)
+                const Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.warning_outlined,
+                          color: Colors.amber,
+                        ),
+                        Text(
+                            'К сожалению, ваш браузер не поддерживает Bluetooth'),
+                      ],
+                    ),
+                  ],
+                ),
+              if (!tion.connected && isBluetoothApiSupported)
                 const Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text('Ожидание соединения...'),
+                    Padding(padding: EdgeInsets.symmetric(vertical: 8.0)),
+                    Text(
+                        'Для подключения используйте плавающую кнопку справа внизу.'),
                     Padding(padding: EdgeInsets.symmetric(vertical: 8.0)),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -122,8 +146,7 @@ class _TionFlasherAppState extends State<TionFlasherApp>
             ],
           ),
           floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-          floatingActionButton: !FlutterWebBluetooth
-                  .instance.isBluetoothApiSupported
+          floatingActionButton: !isBluetoothApiSupported
               ? null
               : Builder(builder: (context) {
                   return FloatingActionButton(
@@ -146,7 +169,7 @@ class _TionFlasherAppState extends State<TionFlasherApp>
   }
 
   Future<void> requestDevice() async {
-    if (!FlutterWebBluetooth.instance.isBluetoothApiSupported) {
+    if (!isBluetoothApiSupported) {
       _reportError("Отсутствует поддержка Bluetooth в браузере");
       return;
     }
@@ -195,7 +218,7 @@ class _TionFlasherAppState extends State<TionFlasherApp>
     } on DeviceNotFoundError {
       _reportError("Не найдено подходящих устройств");
     } catch (e, s) {
-      _reportError(e.toString());
+      _reportError("Возможно не обеспечено сопряжение с бризером!\n$e");
       log.e(e, stackTrace: s);
     }
   }
