@@ -18,6 +18,7 @@ on:
 env:
   BUILD_BASE_HREF: /tion-web/
   BUILD_OUTPUT: build
+  APP_REVISION: ${{ github.sha }}
 
 permissions:
   contents: write # allow creating/updating Releases & uploading assets
@@ -59,7 +60,7 @@ jobs:
         run: flutter test --coverage
 
       - name: 🏗️ Build project
-        run: flutter build web --release --base-href=${{env.BUILD_BASE_HREF}} -o ${{env.BUILD_OUTPUT}}
+        run: flutter build web --release --base-href=${{env.BUILD_BASE_HREF}} --dart-define=APP_REVISION=${{env.APP_REVISION}} -o ${{env.BUILD_OUTPUT}}
 
       - name: 📤 Upload static files as artifact
         id: deployment
