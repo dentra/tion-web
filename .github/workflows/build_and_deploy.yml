@@ -1,0 +1,74 @@
+name: 🛠 Build & Release
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - v*.*.*
+    paths-ignore:
+      - .vscode/**
+      - .gitignore
+      - .editorconfig
+      - README.md
+  pull_request:
+    branches:
+      - master
+
+env:
+  BUILD_BASE_HREF: /tion-web/
+  BUILD_OUTPUT: build
+
+permissions:
+  contents: write # allow creating/updating Releases & uploading assets
+  actions: read # allow pulling marketplace actions
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: 📂 Checkout code
+        uses: actions/checkout@v3
+
+      - name: 🚀 Cache pub deps
+        uses: actions/cache@v3
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.yaml') }}
+          restore-keys: ${{ runner.os }}-pub-
+
+      - name: 🦋 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: 📥 Get dependencies
+        run: flutter pub get
+
+      - name: ✅ Run tests
+        run: flutter test --coverage
+
+      - name: 🏗️ Build project
+        run: flutter build web --release --base-href=${{env.BUILD_BASE_HREF}} -o ${{env.BUILD_OUTPUT}}
+
+      - name: 📤 Upload static files as artifact
+        id: deployment
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{env.BUILD_OUTPUT}}
+
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    needs: build
+    steps:
+      - name: 🚀 Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
