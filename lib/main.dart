@@ -106,7 +106,7 @@ class _TionFlasherAppState extends State<TionFlasherApp>
                           color: Colors.amber,
                         ),
                         Text(
-                            'К сожалению, ваш браузер не поддерживает Bluetooth'),
+                            'К сожалению, Ваш браузер не поддерживает Bluetooth'),
                       ],
                     ),
                   ],
