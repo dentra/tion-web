@@ -22,6 +22,8 @@ env:
 permissions:
   contents: write # allow creating/updating Releases & uploading assets
   actions: read # allow pulling marketplace actions
+  id-token: write
+  pages: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
