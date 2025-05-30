@@ -6,7 +6,6 @@
 // tree, read text, and verify that the values of widget properties are correct.
 
 import 'dart:async';
-import 'dart:io';
 import 'dart:typed_data';
 
 // import 'package:flutter/material.dart';
